@@ -1,0 +1,104 @@
+#include "Bureaucrat.h"
+
+Bureaucrat::Bureaucrat() : _name("[bureaucrat]"), _grade(150)
+{
+}
+
+Bureaucrat::Bureaucrat(std::string const &name, int const &grade) : _name(name)
+{
+    if (grade < 1)
+	throw(GradeTooHighException());
+    else if (grade > 150)
+	throw(GradeTooLowException());
+    else
+	_grade = grade;
+}
+
+Bureaucrat::Bureaucrat(Bureaucrat const &model) : _name(model.getName())
+{
+    *this = model;
+}
+
+Bureaucrat::~Bureaucrat()
+{
+}
+
+std::string const	&Bureaucrat::getName() const
+{
+    return (_name);
+}
+
+int	Bureaucrat::getGrade() const
+{
+    return (_grade);
+}
+
+void	Bureaucrat::promote()
+{
+    if (_grade > 1)
+	_grade--;
+    else
+	throw(GradeTooHighException());
+}
+
+void	Bureaucrat::demote()
+{
+    if (_grade < 150)
+	_grade++;
+    else
+	throw(GradeTooLowException());
+}
+
+void	Bureaucrat::signForm(Form &f) const
+{
+    try
+    {
+	f.beSigned(*this);
+	std::cout << _name << " signed " << f << std::endl;
+    }
+    catch (std::exception &e)
+    {
+	std::cout << _name << " couldn't sign form because " << e.what() << std::endl;	
+    }
+}
+
+bool	Bureaucrat::executeForm(Form const &form) const
+{
+    try
+    {
+	if (form.execute(*this))
+	{
+	    std::cout << _name << " executed " << form.getName() << std::endl;
+	    return (true);
+	}
+	else
+	    return (false);
+    }
+    catch (std::exception &e)
+    {
+	std::cout << _name << " couldn't execute form because " << e.what() << std::endl;
+	return (false);	
+    }
+}
+
+Bureaucrat	&Bureaucrat::operator=(Bureaucrat const &rhs)
+{
+    _grade = rhs.getGrade();
+    return (*this);
+}
+
+std::ostream	&operator<<(std::ostream &o, Bureaucrat const &rhs)
+{
+    o << rhs.getName() << ", bureaucrat grade " << rhs.getGrade() << '.';
+    return (o);
+}
+
+const char *Bureaucrat::GradeTooHighException::what() const throw()
+{
+    return ("an exceptional error occured : grade too high");
+}
+
+const char *Bureaucrat::GradeTooLowException::what() const throw()
+{
+    return ("an exceptional error occured : grade too low");
+}
